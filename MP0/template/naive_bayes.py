@@ -50,6 +50,20 @@ Main function for training and predicting with naive bayes.
 def naive_bayes(train_labels, train_data, dev_data, laplace=1.0, pos_prior=0.5, silently=False):
     print_values(laplace,pos_prior)
 
+    poscount = Counter()
+    negcount = Counter()
+    totpos = 0
+    totneg = 0
+
+    for x in range(len(train_data)):
+        if (train_labels[x] == 1):
+            poscount.update(train_data[x])
+            totpos = totpos + len(train_data[x])
+        if (train_labels[x] == 0):
+            negcount.update(train_data[x])
+            totneg = totneg + len(train_data[x])
+        
+
     yhats = []
     for doc in tqdm(dev_data, disable=silently):
         yhats.append(-1)
