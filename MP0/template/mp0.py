@@ -61,9 +61,9 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='CS440 MP1 Naive Bayes')
-    parser.add_argument('--training', dest='training_dir', type=str, default = 'data/movie_reviews/train',
+    parser.add_argument('--training', dest='training_dir', type=str, default =r'MP0\template\data\movie_reviews\train',
                         help='the directory of the training data')
-    parser.add_argument('--development', dest='development_dir', type=str, default = 'data/movie_reviews/dev',
+    parser.add_argument('--development', dest='development_dir', type=str, default =r'MP0\template\data\movie_reviews\dev',
                         help='the directory of the development data')
 
     # When doing final testing, reset the default values below to match your settings in naive_bayes.py
