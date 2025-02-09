@@ -10,7 +10,12 @@ from planar_arm import Arm
 # y = slope * x + intercept + uniform_noise
 #   where uniform_noise is uniformly distributed between -noise and noise
 def create_linear_data(num_samples, slope, intercept, x_range=[-1.0, 1.0], noise=0.1):
-    pass
+    x1 = np.random.uniform(x_range[0], x_range[1]+1, num_samples)
+    x = x1.reshape(num_samples, 1)
+    y = np.copy(x)
+    for i in range(num_samples):
+        y[i] = slope * x[i] + intercept + np.random.uniform(-noise, noise)
+    return x,y
 
 # return the modified features for simple linear regression
 # x is a numpy array of shape (num_samples, num_features)
