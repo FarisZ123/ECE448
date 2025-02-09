@@ -31,13 +31,14 @@ def get_simple_linear_features(x):
 #   which have shape (num_samples, num_modified_features)
 #   for example get_simple_linear_features
 def linear_prediction(x, A, get_modified_features):
-    pass
+    return np.dot(get_modified_features(x), A)
+
 
 # return the mean squared error loss
 # y_pred is a numpy array of shape (num_samples, 1)
 # y_true is a numpy array of shape (num_samples, 1)
 def mse_loss(y_pred, y_true):
-    pass
+    return np.sum((y_pred - y_true) ** 2) / len(y_true)
 
 # return the model error for linear regression
 def compute_model_error(x, y, A, get_modified_features):
