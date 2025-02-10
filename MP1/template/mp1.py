@@ -10,10 +10,10 @@ from planar_arm import Arm
 # y = slope * x + intercept + uniform_noise
 #   where uniform_noise is uniformly distributed between -noise and noise
 def create_linear_data(num_samples, slope, intercept, x_range=[-1.0, 1.0], noise=0.1):
-    x1 = np.random.uniform(x_range[0], x_range[1], num_samples)
-    x = x1.reshape(num_samples, 1)
-    y = slope * x + intercept + np.random.uniform(-noise, noise)
-    return x,y
+    x = np.random.uniform(x_range[0], x_range[1], (num_samples, 1))  # (num_samples, 1)
+    noise = np.random.uniform(-noise, noise, (num_samples, 1))  # Per-sample noise
+    y = slope * x + intercept + noise
+    return x, y
 
 # return the modified features for simple linear regression
 # x is a numpy array of shape (num_samples, num_features)
@@ -50,7 +50,8 @@ def compute_model_error(x, y, A, get_modified_features):
 # X is a numpy array of shape (num_samples, num_modified_features)
 # y is a numpy array of shape (num_samples, 1)
 def analytical_linear_regression(X, y):
-    pass
+    return np.dot(np.linalg.inv(np.dot(X.T, X)), np.dot(X.T, y))
+
 
 # -------------- gradient descent for linear regression --------------
 
@@ -62,7 +63,8 @@ def analytical_linear_regression(X, y):
 # X is a numpy array of shape (num_samples, num_modified_features)
 # y is a numpy array of shape (num_samples, 1)
 def get_linear_regression_gradient(A, X, y):
-    pass
+    N = y.shape[0]
+    return( 2 * np.dot(X.T,(np.dot(X,A) - y)) / N )
 
 # return matrix A of parameters, A has shape (num_modified_features, 1)
 #   in particular run gradient descent with learning rate learning_rate for num_iterations
