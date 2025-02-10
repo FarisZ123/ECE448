@@ -72,7 +72,12 @@ def get_linear_regression_gradient(A, X, y):
 # get_gradient is a function that returns the gradient of the loss function with respect to A
 #   i.e., get_gradient = lambda A: get_linear_regression_gradient(A, X, y) 
 def gradient_descent(get_gradient, A_init, learning_rate, num_iterations):
-    pass
+    A = A_init
+    for i in range (num_iterations):
+        A = A - learning_rate * get_gradient(A)
+        
+    return A
+        
 
 # -------------- stochastic gradient descent for linear regression --------------
 
