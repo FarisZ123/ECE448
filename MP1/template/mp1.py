@@ -123,24 +123,14 @@ def create_sine_data(num_samples, x_range=[0.0, 2*np.pi], noise=0.1):
 # return a numpy array of shape (num_samples, num_features * (degree + 1))
 #   i.e., return X = [x^n, x^(n-1), ..., x, 1]
 def get_polynomial_features(x, degree):
+    output = []
     
-    num_samples, num_features = x.shape
-    # Initialize an empty list to store the polynomial features
-    poly_features = []
-    
-    # Generate polynomial features for each feature in x
     for d in range(degree, -1, -1):
-        if d == 0:
-            # Append a column of ones for the bias term (x^0)
-            poly_features.append(np.ones((num_samples, num_features)))
-        else:
-            # Append x^d
-            poly_features.append(x ** d)
+            output.append(x ** d)
     
-    # Stack all the polynomial features horizontally
-    X_poly = np.hstack(poly_features)
+    output = np.hstack(output)
     
-    return X_poly
+    return output
 
 # -------------- inverse kinematics via gradient descent --------------
 
@@ -151,7 +141,10 @@ def get_polynomial_features(x, degree):
 # config is a numpy array of shape (num_joints,)
 # goal is a numpy array of shape (2,)
 def ik_loss(arm : Arm, config, goal):
-    pass
+    currx, curry = arm.forward_kinematics(config)[-1]
+    goalx, goaly = goal
+    return np.sqrt(((goalx - currx) ** 2) + ((goaly - curry) ** 2))
+
 
 # we provide a more complex loss function that includes obstacles
 # this loss is high when the arm is close to an obstacle
@@ -184,7 +177,10 @@ def ik_loss_with_obstacles(arm : Arm, config, goal, obstacles):
 #   points should be sampled uniformly a distance epsilon from config (in each dimension)
 # HINT: array broadcasting is your friend, and if you don't know what this means look it up
 def sample_near(num_samples, config, epsilon=0.1):
-    pass
+    rand_offsets = np.random.uniform(-epsilon, epsilon, (num_samples, config.shape[0]))
+    output = config + rand_offsets
+
+    return output
 
 # estimate the gradient of the loss function at config by sampling nearby points 
 #   and picking the direction of increased loss
@@ -193,4 +189,18 @@ def sample_near(num_samples, config, epsilon=0.1):
 # config is a numpy array of shape (num_features,)
 # num_samples is the number of samples to use to estimate the gradient (use sample_near)
 def estimate_ik_gradient(loss, config, num_samples):
-    pass
+    epsilon = 0.1
+    samples = sample_near(num_samples, config, epsilon)
+    lossorig = loss(config)
+    lossvals = np.array([loss(sample) for sample in samples])
+
+    lossdiff = lossvals - lossorig
+    vectors = samples - config
+
+    gradient = np.sum(lossdiff[:, np.newaxis] * vectors, axis=0)
+
+    normarray = np.linalg.norm(gradient)
+
+    gradient = gradient/normarray
+
+    return gradient
