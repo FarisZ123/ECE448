@@ -11,8 +11,8 @@ from planar_arm import Arm
 #   where uniform_noise is uniformly distributed between -noise and noise
 def create_linear_data(num_samples, slope, intercept, x_range=[-1.0, 1.0], noise=0.1):
     x = np.random.uniform(x_range[0], x_range[1], (num_samples, 1))  # (num_samples, 1)
-    noise = np.random.uniform(-noise, noise, (num_samples, 1))  # Per-sample noise
-    y = slope * x + intercept + noise
+    new_noise = np.random.uniform(-noise, noise, (num_samples, 1))  # Per-sample noise
+    y = slope * x + intercept + new_noise
     return x, y
 
 # return the modified features for simple linear regression
@@ -111,7 +111,10 @@ def stochastic_gradient_descent(get_batch_gradient, A_init, learning_rate, num_e
 # y = sin(x) + uniform_noise
 # uniform_noise is uniformly distributed between -noise and noise
 def create_sine_data(num_samples, x_range=[0.0, 2*np.pi], noise=0.1):
-    pass
+    x = np.random.uniform(x_range[0], x_range[1], (num_samples, 1))  # (num_samples, 1)
+    new_noise = np.random.uniform(-noise, noise, (num_samples, 1))  # Per-sample noise
+    y = np.sin(x) + new_noise
+    return x, y
 
 # return the modified polynomial features for doing linear regression
 #   i.e., polynomial regression: y = a_n * x^n + ... + a_1 * x + a_0
@@ -120,7 +123,24 @@ def create_sine_data(num_samples, x_range=[0.0, 2*np.pi], noise=0.1):
 # return a numpy array of shape (num_samples, num_features * (degree + 1))
 #   i.e., return X = [x^n, x^(n-1), ..., x, 1]
 def get_polynomial_features(x, degree):
-    pass
+    
+    num_samples, num_features = x.shape
+    # Initialize an empty list to store the polynomial features
+    poly_features = []
+    
+    # Generate polynomial features for each feature in x
+    for d in range(degree, -1, -1):
+        if d == 0:
+            # Append a column of ones for the bias term (x^0)
+            poly_features.append(np.ones((num_samples, num_features)))
+        else:
+            # Append x^d
+            poly_features.append(x ** d)
+    
+    # Stack all the polynomial features horizontally
+    X_poly = np.hstack(poly_features)
+    
+    return X_poly
 
 # -------------- inverse kinematics via gradient descent --------------
 
