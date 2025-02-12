@@ -72,10 +72,9 @@ def get_linear_regression_gradient(A, X, y):
 # get_gradient is a function that returns the gradient of the loss function with respect to A
 #   i.e., get_gradient = lambda A: get_linear_regression_gradient(A, X, y) 
 def gradient_descent(get_gradient, A_init, learning_rate, num_iterations):
-    A = A_init
+    A = A_init.copy()
     for i in range (num_iterations):
-        A = A - learning_rate * get_gradient(A)
-        
+        A = A - learning_rate * get_gradient(A)   
     return A
         
 
@@ -94,7 +93,14 @@ def gradient_descent(get_gradient, A_init, learning_rate, num_iterations):
 # batch_size is an integer representing the number of samples to use in each iteration
 #   1 <= batch_size <= data_size
 def stochastic_gradient_descent(get_batch_gradient, A_init, learning_rate, num_epochs, data_size, batch_size):
-    pass
+    A = A_init.copy()
+    for i in range(num_epochs):
+        indices = np.random.permutation(data_size)
+        for j in range(0, data_size, batch_size):
+            batch_indices = indices[j:j + batch_size]
+            A = A - (learning_rate * get_batch_gradient(A, batch_indices))
+
+    return A
 
 # -------------- polynomial regression for sine function --------------
 
