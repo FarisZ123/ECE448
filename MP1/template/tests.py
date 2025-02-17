@@ -187,3 +187,17 @@ def test_estimate_ik_gradient():
     # check that moving in opposite direction of grad is improving the loss
     assert loss(q - grad) < loss(q)
 
+if __name__ == "__main__":
+    test_create_linear_data(num_samples = 100, slope = 2, intercept = 1, x_range = [-10,10], noise = 1)
+    test_get_simple_linear_features(num_samples=10, num_features=1)
+    test_linear_prediction()
+    test_mse_loss()
+    test_analytical_linear_regression()
+    test_linear_regression_gradient()
+    test_gradient_descent()
+    test_stochastic_gradient_descent()
+    test_create_sine_data(num_samples = 100, x_range = [-np.pi,np.pi], noise = 1)
+    test_get_polynomial_features(15, 1, 5)
+    test_ik_loss()
+    test_sample_near()
+    test_estimate_ik_gradient()
