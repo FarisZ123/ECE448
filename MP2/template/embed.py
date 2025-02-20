@@ -26,7 +26,17 @@ def initialize(data, dim):
     @return:
     embedding - dict mapping from words (strings) to numpy arrays of dimension=dim.
     '''
-    raise RuntimeError("You need to write this part!")
+    words = list(set(data))
+    num_of_words = len(words)
+    angles = np.linspace(0, 2 * np.pi, num_of_words, endpoint=False)
+    circle_points = np.array([(np.cos(angle), np.sin(angle)) for angle in angles])
+    
+    embedding = {}
+    for i, word in enumerate(words):
+        first_two_dims = circle_points[i]
+        remaining_dims = np.random.normal(0, 1, dim - 2)
+        embedding[word] = np.concatenate([first_two_dims, remaining_dims])
+
     return embedding
 
 def gradient(embedding, data, t, d, k):
@@ -43,8 +53,31 @@ def gradient(embedding, data, t, d, k):
     @return:
     g (numpy array) - loss gradients with respect to embedding of data[t]
     '''
-    raise RuntimeError("You need to write this part!")
+
+    target_word = data[t]
+    target_vec = embedding[target_word]
+    context_indices = [i for i in range(max(0, t - d), min(len(data), t + d + 1)) if i != t]
+    
+    g = np.zeros_like(target_vec)
+    
+    for c in context_indices:
+        context_word = data[c]
+        context_vec = embedding[context_word]
+
+        score = np.dot(target_vec, context_vec)
+        prob = 1 / (1 + np.exp(-score))
+        g += (prob - 1) * context_vec
+
+        negative_samples = np.random.choice(data, k, replace=True)
+        for neg_word in negative_samples:
+            neg_vec = embedding[neg_word]
+            neg_score = np.dot(target_vec, neg_vec)
+            neg_prob = 1 / (1 + np.exp(-neg_score))
+            g += neg_prob * neg_vec 
+    
     return g
+
+
            
 def sgd(embedding, data, learning_rate, num_iters, d, k):
     '''
@@ -61,7 +94,34 @@ def sgd(embedding, data, learning_rate, num_iters, d, k):
     @return:
     embedding - the updated embeddings
     '''
-    raise RuntimeError("You need to write this part!")
+    vocab = list(embedding.keys())
+    
+    for iteration in range(num_iters):
+        for i, target_word in enumerate(data):
+            context_words = data[max(0, i - d):i] + data[i + 1:min(len(data), i + d + 1)]
+            noise_samples = np.random.choice(vocab, size=k, replace=False)
+            target_embedding = embedding[target_word]
+
+            gradient = np.zeros_like(target_embedding)
+            
+
+            for context_word in context_words:
+                context_embedding = embedding[context_word]
+                context_sigmoid = 1 / (1 + np.exp(-np.dot(target_embedding, context_embedding)))
+                gradient += (1 - context_sigmoid) * context_embedding
+
+            for noise_word in noise_samples:
+                noise_embedding = embedding[noise_word]
+                noise_sigmoid = 1 / (1 + np.exp(-np.dot(target_embedding, noise_embedding)))
+                gradient -= noise_sigmoid * noise_embedding
+
+            gradient_norm = np.linalg.norm(gradient)
+            if gradient_norm > 1.0:
+                gradient = gradient / gradient_norm 
+            
+
+            embedding[target_word] += learning_rate * gradient
+            
     return embedding
     
 
