@@ -25,7 +25,32 @@ def training(sentences):
     
     # TODO: (I)
     # Input the training set, output the formatted probabilities according to data statistics.
-    
+    for sentence in sentences:
+        prev = None
+        for i, (word, tag) in enumerate(sentence):
+            if i == 0:
+                init_prob[tag] += 1
+            emit_prob[tag][word] += 1
+            
+            if prev is not None:
+                trans_prob[prev][tag] += 1
+
+            prev = tag
+
+        initsum = sum(init_prob.values())
+        for tag in init_prob:
+            init_prob[tag] /= initsum
+        
+        for tag in emit_prob:
+            emitsum = sum(emit_prob[tag].values())
+            for word in emit_prob:
+                emit_prob[tag][word] /= emitsum
+
+        for firsttag in trans_prob:
+            transsum = sum(trans_prob[firsttag].values())
+            for secondtag in trans_prob[firsttag]:
+                trans_prob[firsttag][secondtag] /= transsum
+
     return init_prob, emit_prob, trans_prob
 
 def viterbi_stepforward(i, word, prev_prob, prev_predict_tag_seq, emit_prob, trans_prob):
